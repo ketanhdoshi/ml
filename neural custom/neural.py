@@ -1,8 +1,20 @@
+# --------------------------------------------------------------------------------------------
+# Basic Neural Network from scratch. The basic building block is the layer which contains
+# the bulk of the logic for forward and back propagation. It then constructs the network layer 
+# by layer. The activation function, the cost function, and the initialisation of the weights
+# and biases are passed in to network. The network can work with any function and does not
+# make any assumption about what those functions are.
+# Currently we have implemented:
+# Weight and Bias Initialisation: Normal Guassian distribution
+# Activation Function: Sigmoid. Could implement ReLU and Softmax as well
+# Cost function: Mean Square Error and Cross Entropy
+# --------------------------------------------------------------------------------------------
+
 import numpy as np
 from mnist_loader import load_data_wrapper
 
 # --------------------------------------------------------------------------------------------
-# Test Weight and Bias Initialisation function
+# Dummy Weight and Bias Initialisation function used for testing
 # --------------------------------------------------------------------------------------------
 class TestWeightBiasInit(object):
 
@@ -16,6 +28,7 @@ class TestWeightBiasInit(object):
 
 # --------------------------------------------------------------------------------------------
 # Normal Gaussian distribution Weight and Bias Initialisation function
+# Returns W (size, size_in) and b (size, 1)
 # --------------------------------------------------------------------------------------------
 class NormalWeightBiasInit(object):
 
@@ -28,22 +41,24 @@ class NormalWeightBiasInit(object):
         return W, b
 
 # --------------------------------------------------------------------------------------------
-# Test Activation function
+# Dummy Activation function for testing
 # --------------------------------------------------------------------------------------------
 class TestActivation(object):
 
     @staticmethod
     def fn(x):
-        """Return the value of the test function for input x"""
+        """Return the value of the activation function for input x"""
         return x + 1
 
     @staticmethod
     def dfndx(y):
-        """Return the derivative of the test function"""
+        """Return the derivative of the activation function"""
         return y - 9
 
 # --------------------------------------------------------------------------------------------
 # Sigmoid Activation function
+# Consists of two functions: the first is used during forward prop and the second for back prop
+# Returns matrices of the same shape as the input
 # --------------------------------------------------------------------------------------------
 class SigmoidActivation(object):
 
@@ -58,7 +73,8 @@ class SigmoidActivation(object):
         return SigmoidActivation.fn(y)*(1-SigmoidActivation.fn(y))
 
 # --------------------------------------------------------------------------------------------
-# Quadratic Cost function
+# Quadratic Cost function based on Mean Square Error
+# Consists of two functions: the first is used during forward prop and the second for back prop
 # --------------------------------------------------------------------------------------------
 class QuadraticCost(object):
 
@@ -75,6 +91,7 @@ class QuadraticCost(object):
 
 # --------------------------------------------------------------------------------------------
 # Cross Entropy Cost function
+# Consists of two functions: the first is used during forward prop and the second for back prop
 # --------------------------------------------------------------------------------------------
 class CrossEntropyCost(object):
 
@@ -98,26 +115,57 @@ class CrossEntropyCost(object):
         """
         return (y-t)
 
+# --------------------------------------------------------------------------------------------
+# The Layer is the primary object in the network. The layer consists of several matrices
+# which represent the nodes and related components in that layer. These matrices are the 
+# input values, the intermediate values, the output values, the weights, the biases and the 
+# various derivatives of the cost wrt each of these.
+#
+# The Layer performs three main operations:
+#   Forward - computes the output value of the layer based on the input value. These will 
+#                get passed on to the next layer. The output is computed in two steps. The
+#                first step computes an intermediate value from the input, and the second
+#                step computes the output value by applying an activation function to the
+#                intermediate value
+#   Backward - the next layer passes in the derivative of the cost wrt the output of this
+#                layer. This layer in turn computes the derivatives of the cost wrt the 
+#                intermediate values, wrt the weight, wrt the bias and wrt to the output
+#                value of the previous layer, which will then get passed on to the prev layer.
+#   Grad Descent - updates the weight and bias based on the derivatives (ie. gradients)
+#                computed in the Backward step.
+# --------------------------------------------------------------------------------------------
 class Layer(object):
     def __init__(self, size_in, size, wbInit, activation):
-        # Initialize this layer with random weights and any other  
-        # parameters we may need.
+        """ Initialize this layer with random weights and any other parameters we may need.
+        """
+        # size: the number of nodes in this layer
+        # size_in: the number of nodes in the previous layer
         self.size = size
 
-         # W.shape = (size x size_in)
-         # b.shape = (size x 1)
+        # Weight and bias of the layer
+        # W.shape = (size x size_in)
+        # b.shape = (size x 1)
         self.W, self.b = wbInit.fn(size_in, size)
 
+        # Y_in: output of the previous layer which is the input to this layer
+        # X: Intermediate value of this layer computed from the input
+        # Y: output of this layer (which becomes the input to the next layer)
         self.X = None # shape (size x 1)
         self.Y = None # shape (size x 1)
         self.Y_in = None # shape (size_in x 1)
         
+        # dCdy: Derivative of Cost wrt output of this layer (which gets passed in from the next layer)
+        # dCdx: Derivative of Cost wrt intermediate value of this layer
         self.dCdy = None # shape (size x 1)
         self.dCdx = None # shape (size x 1)
 
+        # dCdW: Derivative of Cost wrt weight for one training sample
+        # sigma_dCdW: Total Derivative of Cost wrt weight for all training samples
+        # dCdb: as above for bias
         self.sigma_dCdW = np.zeros((size, size_in)) # shape (size x size_in)
         self.sigma_dCdb = np.zeros((size, 1)) # shape (size x 1)
 
+        # Activation function to compute output value from the intermediate value
         self.activation = activation
         print ('Layer has size %d by %d' % (size_in, size))
 
@@ -205,6 +253,47 @@ class Layer(object):
         #print('New weight is ', self.W)
         #print('New bias is ', self.b)
 
+# --------------------------------------------------------------------------------------------
+# The network consists simply of a sequence of layers. The goal of training the network is
+# to find the optimum values of the Weights and the Biases in each layer, which can be
+# thought of as the parameters of the network. The completed trained model basically means
+# figuring out the best values of those Weights and Biases to be able to make accurate
+# predictions. 
+# 
+# The network also has other hyperparameters which define the architecture of
+# the network eg. the number of layers, number of nodes in each layer, how the weights are
+# initialised, what activation function to use, what cost function to use, what learning
+# rate to use and so on. Those constitute the basic structure of the network, so for a 
+# particular training run those are fixed. However one can have multiple training runs where
+# you experiment with different network architectures by trying different settings for those
+# hyperparameters. That logic is not part of this implementation. This implementation does
+# one training run. So you would call this implementation multiple times with different
+# settings values for those hyperparameters. 
+# 
+# The training of the network then consists of feeding in the training data over and over 
+# again. Each full pass over the data is called an epoch, and each epoch is broken down 
+# into a number of mini-batches of data. During each mini-batch, the network processes 
+# the input data in that mini-batch to compute the predicted output value based on that 
+# input data. Those predicted values are then compared to the expected values via a cost 
+# function (aka loss function). The objective is to reduce the cost from one mini-batch
+# to the next by tuning the Weights and Biases. This is achieved via an optimisation
+# algorithm called Stochastic Gradient Descent, which basically takes the derivatives
+# of the cost function with respect to each of the Weights and Biases in the network
+# after each mini-batch and then adjusts the values of those Weights and Biases by small
+# amounts so as to reduce the loss. Those derivatives are essentially the Gradient
+# of the cost.
+# 
+# The processing of a mini-batch consists of two flows, both of which proceed through 
+# each layer one by one - a feed forward flow through each layer from left to right 
+# and a backward propagation flow through each layer in the reverse direction from 
+# right to left.
+# 
+# The purpose of the feed forward flow is to compute the predicted output values. The
+# purpose of the back prop is to figure out the amounts by which the Weights and Biases
+# should be adjusted. To do this, it has to compute the cost function, and then the
+# derivative of that cost function with respect to the inputs, outputs, weights and biases
+# of each layer, from right to left.
+# --------------------------------------------------------------------------------------------
 class Network(object):
 
     def __init__(self, layer_sizes, wbInit=TestWeightBiasInit, activation=TestActivation, cost=QuadraticCost):
