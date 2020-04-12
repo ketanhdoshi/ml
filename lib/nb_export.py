@@ -31,6 +31,7 @@ def notebook2scriptSingle(fname, out_dir):
     for cell in code_cells: module += ''.join(cell['source'][1:]) + '\n\n'
     # remove trailing spaces
     module = re.sub(r' +$', '', module, flags=re.MULTILINE)
+    out_dir = Path(out_dir)
     if not (out_dir).exists(): (out_dir).mkdir()
     output_path = out_dir/fname_out
     with io.open(output_path, "w", encoding="utf-8") as f:
