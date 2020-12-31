@@ -3,7 +3,7 @@ from io import StringIO
 import pandas as pd
 import pandas.util.testing as pdt
 import numpy.testing as npt 
-from data_prep import get_missing_value_counts, get_nparray, remove_missing_rowcolumns
+from data_prep import get_missing_value_counts, get_nparray, remove_missing_rowcolumns, impute_missing_values, encode_cat_ordinal
 
 csv_data = '''A,B,C,D
 1.0,2.0,3.0,4.0
@@ -13,6 +13,14 @@ csv_data = '''A,B,C,D
 @pytest.fixture
 def mydf():
     return pd.read_csv(StringIO(csv_data))
+
+def catdf():
+    df = pd.DataFrame([['green', 'M', 10.1, 'class1'],
+                   ['red', 'L', 13.5, 'class2'],
+                   ['blue', 'XL', 15.3, 'class1']])
+
+    df.columns = ['color', 'size', 'price', 'classlabel']
+    return(df)
 
 def test_missing_values():
     datadf = mydf()
@@ -43,4 +51,19 @@ def test_remove_missing_rowcolumns():
                   'C': [3., 12.], 'D': [4., float('NaN')]}, index=[0, 2])
     pdt.assert_frame_equal(row_subset_df, expected)
 
- 
+def test_impute_missing_values():
+    datadf = mydf()
+    imputed_df = impute_missing_values (datadf)
+    expected = pd.DataFrame(data = {'A': [1., 5., 10.], 'B': [2., 6., 11.], 
+                  'C': [3., 7.5, 12.], 'D': [4., 8., 6.]}, index=[0, 1, 2])
+    pdt.assert_frame_equal(imputed_df, expected)
+
+def test_encode_cat_ordinal():
+    datadf = catdf()
+    size_mapping = {'XL': 3, 'L': 2, 'M': 1}
+    encode_cat_ordinal (datadf, 'size', size_mapping)
+    expected = pd.DataFrame([['green', 1, 10.1, 'class1'],
+                   ['red', 2, 13.5, 'class2'],
+                   ['blue', 3, 15.3, 'class1']])
+    expected.columns = ['color', 'size', 'price', 'classlabel']
+    pdt.assert_frame_equal(datadf, expected)
