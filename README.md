@@ -57,16 +57,35 @@ Discriminative Learning Rates. Tensorboard integration. Kaggle Dataset.
 - [Q-Learning](apps/RL%20QLearning.ipynb) (Keras): Reinforcement Learning to play a simple game using Q-Learning algorithm
 
 ### Machine Learning
+- [ML End-to-End Workflow](apps/ml-workflow-utils.ipynb) (scikit): Reusable functions for the complete machine learning workflow with tabular data, applied on Kaggle's Titanic dataset as an example. 
+  - Exploratory Data Analysis, Univariate and Bivariate visualization with Seaborn. 
+  - Data summarization, cleaning, pre-processing, and transformations
+  - Feature engineering and feature selection
+  - Automated Model selection and hyperparameter tuning using nested cross-validation with grid search.
+  - Plot model scores including learning and validation curves
+  - Uses regression models, Support Vector Machines, K Nearest Neighbors, Decision Trees, Random Forest and several Ensemble algorithms.
+
+- [ML Workflow with Pipelines](apps/ml-pipeline-utils.ipynb) (scikit): Contains much of the same functionality as above, but is built with scikit Transformers and Pipelines.
 
 ### Other
 - [Geo Location](apps/Geo%20Location.ipynb) (Scikit): Predict trip durations using Random Forest and XGBoost algorithms for geo-location data with Kaggle NYC Taxi dataset. Location-based clusters with both K-means and probabilistic Gaussian Mixture Model. Location features with Geopandas and interactive maps with Folium.
 - [Auto Encoder](apps/Auto%20Encoder.ipynb) (Keras): Build a Variational Auto Encoder model to generate images of handwritten digits, using MNIST dataset.
 
-### Library
+### Deep Learning Library for Pytorch applications
 This contains much of the commonly-used functionality when building deep learning applications with Pytorch. It incorporates a number of useful techniques and best practices to make it easy to build and run these models with only a few lines of code.
 
-Although the implementation is different, many of these ideas and techniques were inspired by Fastai.
+The functionality spans the end-to-end deep learning lifecycle from dataset preparation to creating model architectures, training, visualization and debugging. 
 
-Deep Learning library for advanced Pytorch models. Provides functionality for data preparation in a generic way for datasets in different input formats. Learning Rate Finder.
-- [Data](lib/data_lib.ipynb) - Declaratively specify steps to prepare data from a variety of source input formats
-- [Training](lib/training_lib.ipynb) - Custom Training loop with Callbacks and Schedulers. 
+Although the implementation is different, many of these ideas and techniques were inspired by the Fastai framework.
+
+- [Data](lib/data_lib.ipynb) - Declaratively specify data loading and transformation steps in a generic way to quickly prepare datasets with a few lines of code. Handles most common source input formats for a range of Vision, NLP, Audio, Tabular and other applications.
+- [Training](lib/training_lib.ipynb) - Custom Training loop with Callbacks. Track Loss and define custom Metrics. Enable GPU execution. 
+  - Also includes a Debugging Metrics Tracker to track model metrics for a layer, batch, epoch, or the entire run. Tracks fine-grained activations, weights and gradients at each step of the forward and backward computations.
+  - The metrics can then be visualized in Tensorflow's Tensorboard or as a Pandas dataframe.
+- [Optimizer](lib/optimiser_lib.ipynb) - Common optimizer algorithms including SGD, Momentum, Weight Decay and Adam. Schedulers including One Cycle scheduler. Flexible hyperparameter tuning with variable and discriminative learning rates. Learning Rate Finder and Hyperparameter Recording during training. 
+- [Hooks](lib/hooks_lib.ipynb) - Use Pytorch hooks to introspect the model during training. Track stats of the layer activations and gradients during the forward and backward passes.
+- [Debug](lib/debug_lib.ipynb) - Miscellaneous debugging scripts for memory and performance profiling, and stack trace inspections. Visualization of the Pytorch back propagation auto-gradient graphs.
+- [Image](lib/image_lib.ipynb) - Image data processing utilities with libraries like OpenCV, scipy, Pillow. Display image data batches with labels and predictions. Includes several image augmentation techniques.
+- [Audio](lib/audio_lib.ipynb) - Audio data processing utilities with Librosa and Torchaudio. Includes spectrograms and audio augmentation.
+- [Architecture](lib/arch_lib.ipynb) - Helper functions for building model layers.
+- [Application](lib/arch_lib.ipynb) - Helper functions for building a complete application flow.
