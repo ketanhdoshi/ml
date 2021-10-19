@@ -1,17 +1,4 @@
-# ml
-My ML Experiments
-
-Deep Learning Models are built with either Pytorch or Keras (Tensorflow)
-
-Machine Learning Models are built with Scikit-Learn.
-
-Most build the model from scratch.
-
-A few use open-source model implementations with pre-trained parameters.
-
-All of these use popular publicly available datasets, including several from Kaggle competitions.
-
-Discriminative Learning Rates. Tensorboard integration. Kaggle Dataset.
+# ML Experiments
 
 ### Computer Vision
 - [Pointnet 3D](apps/3D%20Objects%20Pointnet.ipynb) (Pytorch): Build a Pointnet model to classify 3D objects. Source data in Mesh format is converted to Point Cloud. Interactive visualization with Plotly.
