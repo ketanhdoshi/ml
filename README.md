@@ -1,5 +1,7 @@
 # ML Experiments
 
+These are several experimental projects that I did for various machine learning and deep learning applications.
+
 ### Computer Vision
 - [Pointnet 3D](apps/3D%20Objects%20Pointnet.ipynb) (Pytorch): Build a Pointnet model to classify 3D objects. Source data in Mesh format is converted to Point Cloud. Interactive visualization with Plotly.
 - [Facial Keypoints](apps/Facial%20Keypoints.ipynb) (Pytorch): Build a CNN architecture and process video files to identify facial keypoints. Can also input images.
