@@ -59,7 +59,7 @@
 - [Auto Encoder](apps/Auto%20Encoder.ipynb) (Keras): Build a Variational Auto Encoder model to generate images of handwritten digits, using MNIST dataset.
 
 ### Deep Learning Library for Pytorch applications
-This contains much of the commonly-used functionality when building deep learning applications with Pytorch. It incorporates a number of useful techniques and best practices to make it easy to build and run these models with only a few lines of code.
+This adds functionality that is commonly-required when building deep learning applications with Pytorch. It incorporates a number of useful techniques and best practices to make it easy to build and run these models with only a few lines of code.
 
 The functionality spans the end-to-end deep learning lifecycle from dataset preparation to creating model architectures, training, visualization and debugging. 
 
